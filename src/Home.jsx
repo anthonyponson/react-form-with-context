@@ -1,46 +1,51 @@
-import { useEffect, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { stateContext } from './Context'
 
-function Home() {
-  const [tasks, setTasks] = useState([])
-  const navigate = useNavigate()
+const Home = () => {
+  const {
+    state: { forms },
+    dispatch
+  } = useContext(stateContext)
+  console.log(forms)
 
-  useEffect(() => {
-    const storedTasks = JSON.parse(localStorage.getItem('tasks') || [])
-    setTasks(storedTasks)
-  }, [])
+  let navigate = useNavigate()
 
-  const edit = () => {}
-  const deleteButton = () => {}
-
-  const goToForm = () => {
+  const form = () => {
     navigate('/form')
+  }
+
+  const deleteButton = (index) => {
+    const temp = forms.filter((_, i) => i !== index)
+    dispatch({
+      type: 'TASK',
+      payload: temp
+    })
+  }
+
+  const editButton = (task, index) => {
+    navigate('/form')
+    dispatch({
+      type: 'EDIT',
+      payload: [task, index]
+    })
   }
 
   return (
     <>
-      <nav className="nav">
-        <li onClick={goToForm} className="list-item">
-          Form
-        </li>
-      </nav>
       <div>
-        <h1>tasks</h1>
-        <ul>
-          {tasks.map((task, index) => (
-            <li key={index}>
-              {task.taskName} {task.taskDes}
-              <input type="checkbox" checked={task.checked} />
-              <label> {task.checked ? 'compleated' : 'not compleated'}</label>
-              <button onClick={edit} data-index={index}>
-                Edit
-              </button>
-              <button onClick={deleteButton} data-index={index}>
-                delete
-              </button>
+        {forms.map((task, index) => (
+          <ul key={index}>
+            <li>
+              {task.name} : {task.description} -{' '}
+              <input type="checkbox" checked={task.isComplete} />
+              <button onClick={() => deleteButton(index)}>Delete</button>
+              <button onClick={() => editButton(task, index)}>Edit</button>
             </li>
-          ))}
-        </ul>
+          </ul>
+        ))}
+
+        <button onClick={() => form()}>Go to Form</button>
       </div>
     </>
   )
