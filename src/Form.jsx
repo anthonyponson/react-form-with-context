@@ -1,92 +1,82 @@
-import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useContext, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { stateContext } from './Context'
 
-function Form() {
-  const [taskName, setName] = useState('')
-  const [taskDes, setDes] = useState('')
-  const [checked, setCheked] = useState(false)
-  const [submit, isSubmit] = useState(false)
-  const [tasks, setTasks] = useState([])
+const Form = () => {
+  const { state, dispatch } = useContext(stateContext)
 
-  const navigate = useNavigate()
+  const [taskName, setTaskName] = useState(
+    state.edit ? state.edit[0]?.name : ''
+  )
+  const [taskDes, setTaskDes] = useState(
+    state.edit ? state.edit[0]?.description : ''
+  )
+  const [checked, setChecked] = useState(
+    state.edit ? state.edit[0]?.isComplete : false
+  )
 
-  useEffect(() => {
-    const storedTask = JSON.parse(localStorage.getItem('tasks') || [])
-    setTasks(storedTask)
-  }, [])
-  const inputChange = (e) => {
+  const sameInput = (e) => {
     if (e.target.name === 'name') {
-      setName(e.target.value)
+      setTaskName(e.target.value)
     } else {
-      setDes(e.target.value)
+      setTaskDes(e.target.value)
     }
   }
-
-  const checkboxChange = (e) => {
-    setCheked(e.target.checked)
+  const checking = (e) => {
+    setChecked(e.target.checked)
   }
-  const handleClickSubmit = (e) => {
+
+  const submitHandle = (e) => {
     e.preventDefault()
-    isSubmit(true)
-
     if (taskName === '' || taskDes === '') return
-
-    const newTask = { taskName, taskDes, checked }
-    setTasks([...tasks, newTask])
-    localStorage.setItem('tasks', JSON.stringify([...tasks, newTask]))
-
-    setName('')
-    setDes('')
-    setCheked(false)
-    isSubmit(false)
+    let newTask = {
+      name: taskName,
+      description: taskDes,
+      isComplete: checked
+    }
+    if (state.edit?.length > 0) {
+      const temp = [...state.forms]
+      temp[state.edit[1]] = newTask
+      dispatch({
+        type: 'TASK',
+        payload: temp
+      })
+      dispatch({
+        type: 'EDIT',
+        payload: []
+      })
+    } else {
+      dispatch({
+        type: 'TASK',
+        payload: [...state.forms, newTask]
+      })
+    }
+    setTaskName('')
+    setTaskDes('')
+    setChecked(false)
   }
 
-  const goToHome = () => {
-    navigate('/home')
+  const navigation = useNavigate()
+
+  const Home = () => {
+    navigation('/home')
   }
+
   return (
-    <>
-      <div>
-        <nav className="nav">
-          <li className="list-item" onClick={goToHome}>
-            Home
-          </li>
-        </nav>
-      </div>
+    <div>
+      <form onSubmit={submitHandle}>
+        <input name="name" value={taskName} onChange={sameInput}></input>
 
-      <div>
-        <form onSubmit={handleClickSubmit}>
-          <input
-            type="text"
-            value={taskName}
-            name="name"
-            onChange={inputChange}
-          />
-          {taskName === '' && submit && <div>task name is required</div>}
-          <input
-            type="text"
-            value={taskDes}
-            name="des"
-            onChange={inputChange}
-          />
-          {taskDes === '' && submit && <div>task description is required</div>}
-          <input type="checkbox" checked={checked} onChange={checkboxChange} />
+        <input name="des" value={taskDes} onChange={sameInput}></input>
 
-          <input type="submit" />
-        </form>
-
-        <h1>Taks:</h1>
-        <ul>
-          {tasks.map((task, index) => (
-            <li key={index}>
-              {task.taskName} - {task.taskDes} :
-              <input type="checkbox" checked={task.checked} />
-              <label>{task.checked ? 'compleated' : 'not compleated'} </label>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </>
+        <input checked={checked} onChange={checking} type="checkbox"></input>
+        <input type="submit"></input>
+        {/* <button onClick={() => dispatch({ type: 'EDIT', payload: [] })}>
+          Cancel
+        </button> */}
+        <button onClick={() => Home()}>Go To Home</button>
+      </form>
+    </div>
   )
 }
 
