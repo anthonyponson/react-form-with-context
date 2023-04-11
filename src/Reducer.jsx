@@ -1,0 +1,36 @@
+export const initialState = {
+  isLogedIn: false,
+  forms: [],
+  edit: [],
+  userData: [
+    {
+      id: 1,
+      username: 'tony',
+      password: '123'
+    },
+    {
+      id: 2,
+      username: 'stark',
+      password: '123'
+    }
+  ]
+}
+
+export const stateReducer = (state, action) => {
+  console.log('state', state, 'action', action)
+  switch (action.type) {
+    case 'TASK':
+      return {
+        ...state,
+        forms: action.payload
+      }
+    case 'EDIT':
+      return {
+        ...state,
+        edit: action.payload
+      }
+    default: {
+      return state
+    }
+  }
+}
