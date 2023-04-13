@@ -28,29 +28,38 @@ const Form = () => {
 
   const submitHandle = (e) => {
     e.preventDefault()
-    if (taskName === '' || taskDes === '') return
-    let newTask = {
-      name: taskName,
-      description: taskDes,
-      isComplete: checked
+
+    if (taskName === '' || taskDes === '') {
+      return
     }
+
+    const newTask = {
+      taskname: taskName,
+      taskdescription: taskDes,
+      taskisComplete: checked
+    }
+
     if (state.edit?.length > 0) {
-      const temp = [...state.forms]
-      temp[state.edit[1]] = newTask
+      const updatedForms = state.forms.map((task, index) =>
+        index === state.edit[1] ? newTask : task
+      )
+
       dispatch({
-        type: 'TASK',
-        payload: temp
+        type: 'tasks',
+        payload: updatedForms
       })
+
       dispatch({
-        type: 'EDIT',
+        type: 'edit',
         payload: []
       })
     } else {
       dispatch({
-        type: 'TASK',
+        type: 'tasks',
         payload: [...state.forms, newTask]
       })
     }
+
     setTaskName('')
     setTaskDes('')
     setChecked(false)
@@ -71,9 +80,6 @@ const Form = () => {
 
         <input checked={checked} onChange={checking} type="checkbox"></input>
         <input type="submit"></input>
-        {/* <button onClick={() => dispatch({ type: 'EDIT', payload: [] })}>
-          Cancel
-        </button> */}
         <button onClick={() => Home()}>Go To Home</button>
       </form>
     </div>
