@@ -16,9 +16,9 @@ const Home = () => {
   }
 
   const deleteButton = (index) => {
-    const temp = forms.filter((_, i) => i !== index)
+    const temp = forms.filter((task, i) => i !== index)
     dispatch({
-      type: 'TASK',
+      type: 'tasks',
       payload: temp
     })
   }
@@ -26,7 +26,7 @@ const Home = () => {
   const editButton = (task, index) => {
     navigate('/form')
     dispatch({
-      type: 'EDIT',
+      type: 'edit',
       payload: [task, index]
     })
   }
@@ -39,6 +39,7 @@ const Home = () => {
             <li>
               {task.name} : {task.description} -{' '}
               <input type="checkbox" checked={task.isComplete} />
+              <label>{task.isComplete ? 'completed' : 'not completed'}</label>
               <button onClick={() => deleteButton(index)}>Delete</button>
               <button onClick={() => editButton(task, index)}>Edit</button>
             </li>
