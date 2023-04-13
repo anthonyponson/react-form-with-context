@@ -28,27 +28,19 @@ const Form = () => {
 
   const submitHandle = (e) => {
     e.preventDefault()
-
-    if (taskName === '' || taskDes === '') {
-      return
+    if (taskName === '' || taskDes === '') return
+    let newTask = {
+      name: taskName,
+      description: taskDes,
+      isComplete: checked
     }
-
-    const newTask = {
-      taskname: taskName,
-      taskdescription: taskDes,
-      taskisComplete: checked
-    }
-
     if (state.edit?.length > 0) {
-      const updatedForms = state.forms.map((task, index) =>
-        index === state.edit[1] ? newTask : task
-      )
-
+      const temp = [...state.forms]
+      temp[state.edit[1]] = newTask
       dispatch({
         type: 'tasks',
-        payload: updatedForms
+        payload: temp
       })
-
       dispatch({
         type: 'edit',
         payload: []
@@ -59,7 +51,6 @@ const Form = () => {
         payload: [...state.forms, newTask]
       })
     }
-
     setTaskName('')
     setTaskDes('')
     setChecked(false)
