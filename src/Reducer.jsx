@@ -19,12 +19,12 @@ export const initialState = {
 export const stateReducer = (state, action) => {
   console.log('state', state, 'action', action)
   switch (action.type) {
-    case 'TASK':
+    case 'tasks':
       return {
         ...state,
         forms: action.payload
       }
-    case 'EDIT':
+    case 'edit':
       return {
         ...state,
         edit: action.payload
